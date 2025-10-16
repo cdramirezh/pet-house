@@ -66,7 +66,8 @@ app.get("/webhook", (req, res) => {
         console.log("Webhook verified successfully!");
     } else {
         // respond with '403 Forbidden' if verify tokens do not match
-        res.sendStatus(403);
+        console.error("Token verification failed. Token: ", token);
+        res.sendStatus(403).end();
     }
 });
 
