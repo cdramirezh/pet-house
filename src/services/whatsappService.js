@@ -42,6 +42,37 @@ class WhatsAppService {
       console.error('Error marking message as read:', error);
     }
   }
+
+  async sendReplyButton(recipientPhoneNumber, bodyText, buttons) {
+    try {
+      await axios({
+        method: 'POST',
+        url: `https://graph.facebook.com/${config.API_VERSION}/${config.BUSINESS_PHONE}/messages`,
+        headers: {
+          Authorization: `Bearer ${config.API_TOKEN}`,
+        },
+        data: {
+          messaging_product: "whatsapp",
+          recipient_type: "individual",
+          to: recipientPhoneNumber,
+          type: "interactive",
+          interactive: {
+            type: "button",
+            body: {
+              text: bodyText
+            },
+            action: {
+              buttons: buttons
+            }
+          }
+        },
+      });
+    }
+    catch (error) {
+      console.error(error);
+
+    }
+  }
 }
 
 export default new WhatsAppService();

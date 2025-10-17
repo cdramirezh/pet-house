@@ -13,6 +13,7 @@ class MessageHandler {
 
       if (this.isGreeting(incomingMessage)) {
         await this.sendWelcomeMessage(message.from, message.id, senderInfo);
+        await this.sendWelcomeMenu(message.from);
       } else {
         const response = `Echo: ${message.text.body}`;
         await whatsappService.sendMessage(message.from, response, message.id);
@@ -27,6 +28,35 @@ class MessageHandler {
     const welcomeMessage = `Hola ${senderFirstName}, Bienvenido a nuestro servicio de Veterinaria online. 
 En qué puedo ayudarte hoy?`;
     await whatsappService.sendMessage(to, welcomeMessage, messageId);
+  }
+
+  async sendWelcomeMenu(to) {
+    const menuMessage = "Elige una opción";
+    const buttons = [
+      {
+        type: "reply",
+        reply: {
+          id: "UNIQUE_BUTTON_ID_1",
+          title: "Agendar cita"
+        }
+      },
+      {
+        type: "reply",
+        reply: {
+          id: "UNIQUE_BUTTON_ID_2",
+          title: "Consultar historial"
+        }
+      },
+      {
+        type: "reply",
+        reply: {
+          id: "UNIQUE_BUTTON_ID_3",
+          title: "Ver ubicación"
+        }
+      }
+    ]
+
+    await whatsappService.sendReplyButton(to, menuMessage, buttons);
   }
 }
 
