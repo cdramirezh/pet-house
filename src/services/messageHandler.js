@@ -19,6 +19,12 @@ class MessageHandler {
         await whatsappService.sendMessage(message.from, response, message.id);
       }
       await whatsappService.markAsRead(message.id);
+    } else if (message?.type === 'interactive') {
+      const optionTitle = message?.interactive?.button_reply?.title.toLowerCase().trim();
+      const optionId = message?.interactive?.button_reply?.id;
+
+      await this.handleMenuOption(message.from, optionTitle);
+      await whatsappService.markAsRead(message.id);
     }
   }
 
@@ -57,6 +63,25 @@ En qué puedo ayudarte hoy?`;
     ]
 
     await whatsappService.sendReplyButton(to, menuMessage, buttons);
+  }
+
+  async handleMenuOption(to, optionTitle) {
+    let response;
+    switch (optionTitle) {
+      case 'agendar cita':
+        response = 'Agendar cita con veterianario';
+        break;
+      case 'consultar historial':
+        response = 'Consultar historial médico de mi mascota';
+        break;
+      case 'ver ubicación':
+        response = 'Esta es nuestra ubicación: 📌 https://goo.gl/maps/example';
+        break;
+      default:
+        response = 'Opción no reconocida. Por favor, elige una opción válida del menú.';
+    }
+    
+    await whatsappService.sendMessage(to, response, null);
   }
 }
 
