@@ -7,6 +7,11 @@ class MessageHandler {
     return greetings.includes(message);
   }
 
+  isMediaRequest(message) {
+    const mediaTypes = ['audio', 'image', 'video', 'document']
+    return mediaTypes.includes(message);
+  }
+
   async handleIncomingMessage(message, senderInfo) {
     if (message?.type === 'text') {
       const incomingMessage = message.text.body.toLowerCase().trim();
@@ -14,6 +19,8 @@ class MessageHandler {
       if (this.isGreeting(incomingMessage)) {
         await this.sendWelcomeMessage(message.from, message.id, senderInfo);
         await this.sendWelcomeMenu(message.from);
+      } else if (this.isMediaRequest(incomingMessage)) {
+        await this.sendMedia(message.from, incomingMessage);
       } else {
         const response = `Echo: ${message.text.body}`;
         await whatsappService.sendMessage(message.from, response, message.id);
@@ -80,8 +87,40 @@ En qué puedo ayudarte hoy?`;
       default:
         response = 'Opción no reconocida. Por favor, elige una opción válida del menú.';
     }
-    
+
     await whatsappService.sendMessage(to, response, null);
+  }
+
+  async sendMedia(to, mediaType) {
+    const mediaOptions = {
+      audio: {
+        mediaUrl: 'https://s3.amazonaws.com/gndx.dev/medpet-audio.aac',
+        caption: 'Bienvenida',
+        type: 'audio',
+      },
+
+      image: {
+        mediaUrl: 'https://s3.amazonaws.com/gndx.dev/medpet-imagen.png',
+        caption: 'Esto es una Imagen!',
+        type: 'image',
+      },
+
+      video: {
+        mediaUrl: 'https://s3.amazonaws.com/gndx.dev/medpet-video.mp4',
+        caption: '¡Esto es una video!',
+        type: 'video',
+      },
+
+      document: {
+        mediaUrl: 'https://s3.amazonaws.com/gndx.dev/medpet-file.pdf',
+        caption: '¡Esto es un PDF!',
+        type: 'document',
+      }
+    }
+
+    const { mediaUrl, caption, type } = mediaOptions[mediaType];
+
+    await whatsappService.sendMediaMessage(to, type, mediaUrl, caption);
   }
 }
 
