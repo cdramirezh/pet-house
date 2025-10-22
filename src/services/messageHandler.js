@@ -2,6 +2,10 @@ import whatsappService from './whatsappService.js';
 
 class MessageHandler {
 
+  constructor() {
+    this.appointmentState = {};
+  }
+
   isGreeting(message) {
     const greetings = ['hola', 'hello', "hi", "buenas tardes"];
     return greetings.includes(message);
@@ -21,6 +25,8 @@ class MessageHandler {
         await this.sendWelcomeMenu(message.from);
       } else if (this.isMediaRequest(incomingMessage)) {
         await this.sendMedia(message.from, incomingMessage);
+      } else if (this.appointmentState[message.from]) {
+        await this.handleAppointmentFlow(message.from, incomingMessage);
       } else {
         const response = `Echo: ${message.text.body}`;
         await whatsappService.sendMessage(message.from, response, message.id);
@@ -76,7 +82,8 @@ En qué puedo ayudarte hoy?`;
     let response;
     switch (optionTitle) {
       case 'agendar cita':
-        response = 'Agendar cita con veterianario';
+        this.appointmentState[to] = { step: 'name' };
+        response = 'Por favor ingresa tu nombre';
         break;
       case 'consultar historial':
         response = 'Consultar historial médico de mi mascota';
@@ -121,6 +128,33 @@ En qué puedo ayudarte hoy?`;
     const { mediaUrl, caption, type } = mediaOptions[mediaType];
 
     await whatsappService.sendMediaMessage(to, type, mediaUrl, caption);
+  }
+
+  async handleAppointmentFlow(to, message) {
+    const state = this.appointmentState[to];
+    let response;
+
+    switch (state.step) {
+      case 'name':
+        state.name = message;
+        state.step = 'petName';
+        response = 'Gracias, ¿Cuál es el nombre de tu mascota?';
+        break;
+      case 'petName':
+        state.petName = message;
+        state.step = 'petType';
+        response = '¿Qué tipo de mascota tienes? (perro, gato, etc.)';
+        break;
+      case 'petType':
+        state.petType = message;
+        state.step = 'reason';
+        response = 'Cuál es el motivo de tu consulta?';
+        break;
+      case 'reason':
+        state.reason = message;
+        response = `${state.name}. agendado cita para ${state.petType} llamado ${state.petName}. motivo: "${state.reason}".`;
+    }
+    await whatsappService.sendMessage(to, response);
   }
 }
 
