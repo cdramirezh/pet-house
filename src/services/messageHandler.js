@@ -152,9 +152,26 @@ En qué puedo ayudarte hoy?`;
         break;
       case 'reason':
         state.reason = message;
-        response = `${state.name}. agendado cita para ${state.petType} llamado ${state.petName}. motivo: "${state.reason}".`;
+        response = this.completeAppointment(to);
     }
     await whatsappService.sendMessage(to, response);
+  }
+
+  completeAppointment(to) {
+    const appointment = this.appointmentState[to];
+    delete this.appointmentState[to];
+
+    const userData = [
+      to,
+      appointment.name,
+      appointment.petName,
+      appointment.petType,
+      appointment.reason,
+      new Date().toISOString(),
+    ]
+
+    console.log('userData', userData);
+    return `Gracias. Resumen de tu cita:\nNombre: ${appointment.name}\nMascota: ${appointment.petName}\nTipo: ${appointment.petType}\nMotivo: ${appointment.reason}`;
   }
 }
 
