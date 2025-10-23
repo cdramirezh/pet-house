@@ -1,4 +1,5 @@
 import whatsappService from './whatsappService.js';
+import appendToSheet from './googleSheetsService.js';
 
 class MessageHandler {
 
@@ -170,7 +171,7 @@ En qué puedo ayudarte hoy?`;
       new Date().toISOString(),
     ]
 
-    console.log('userData', userData);
+    appendToSheet(userData);
     return `Gracias. Resumen de tu cita:\nNombre: ${appointment.name}\nMascota: ${appointment.petName}\nTipo: ${appointment.petType}\nMotivo: ${appointment.reason}`;
   }
 }

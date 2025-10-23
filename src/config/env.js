@@ -8,4 +8,6 @@ export default {
   BUSINESS_PHONE: process.env.BUSINESS_PHONE,
   API_VERSION: process.env.API_VERSION,
   PORT: process.env.PORT || 3000,
+  CREDENTIAL: process.env.CREDENTIAL,
+  SPREADSHEET_ID: process.env.SPREADSHEET_ID,
 };
