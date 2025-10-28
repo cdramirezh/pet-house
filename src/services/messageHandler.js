@@ -97,6 +97,10 @@ En qué puedo ayudarte hoy?`;
       case 'ver ubicación':
         response = 'Esta es nuestra ubicación: 📌 https://goo.gl/maps/example';
         break;
+      case 'emergencia':
+        response = 'Llama acá para emergencias:';
+        await this.sendContact(to);
+        break;
       default:
         response = 'Opción no reconocida. Por favor, elige una opción válida del menú.';
     }
@@ -216,6 +220,55 @@ En qué puedo ayudarte hoy?`;
 
     ]
     await whatsappService.sendReplyButton(to, menuMessage, buttons);
+  }
+
+  async sendContact(to) {
+    const contact = {
+      addresses: [
+        {
+          street: "123 Calle de las Mascotas",
+          city: "Ciudad",
+          state: "Estado",
+          zip: "12345",
+          country: "País",
+          country_code: "PA",
+          type: "WORK"
+        }
+      ],
+      emails: [
+        {
+          email: "contacto@mpethouse.com",
+          type: "WORK"
+        }
+      ],
+      name: {
+        formatted_name: "PetHouse Contacto",
+        first_name: "PetHouse",
+        last_name: "Contacto",
+        middle_name: "",
+        suffix: "",
+        prefix: ""
+      },
+      org: {
+        company: "PetHouse",
+        department: "Atención al Cliente",
+        title: "Representante"
+      },
+      phones: [
+        {
+          phone: "+1234567890",
+          wa_id: "1234567890",
+          type: "WORK"
+        }
+      ],
+      urls: [
+        {
+          url: "https://www.pethouse.com",
+          type: "WORK"
+        }
+      ]
+    };
+    await whatsappService.sendContactMessage(to, contact);
   }
 }
 

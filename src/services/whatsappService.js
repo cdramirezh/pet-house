@@ -120,6 +120,31 @@ class WhatsAppService {
 
   }
 
+  async sendContactMessage(to, contact) {
+    try {
+      await axios({
+        method: 'POST',
+        url: `https://graph.facebook.com/${config.API_VERSION}/${config.BUSINESS_PHONE}/messages`,
+        headers: {
+          Authorization: `Bearer ${config.API_TOKEN}`,
+        },
+        data: {
+          messaging_product: "whatsapp",
+          to,
+          type: "contacts",
+          contacts: [contact],
+          // messages: [
+          //   {
+          //     id: "wamid.gBGGSFcCNEOPAgkO_KJ55r4w_ww"
+          //   }
+          // ]
+        }
+      })
+    } catch (error) {
+      console.error("Error envío contacto: ", error);
+    }
+  }
+
 }
 
 export default new WhatsAppService();
