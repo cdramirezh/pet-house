@@ -41,7 +41,7 @@ class MessageHandler {
       const optionTitle = message?.interactive?.button_reply?.title.toLowerCase().trim();
       const optionId = message?.interactive?.button_reply?.id;
 
-      await this.handleMenuOption(message.from, optionTitle);
+      await this.handleMenuOption(message.from, optionId);
       await whatsappService.markAsRead(message.id);
     }
   }
@@ -83,18 +83,18 @@ En qué puedo ayudarte hoy?`;
     await whatsappService.sendReplyButton(to, menuMessage, buttons);
   }
 
-  async handleMenuOption(to, optionTitle) {
+  async handleMenuOption(to, optionId) {
     let response;
-    switch (optionTitle) {
-      case 'agendar cita':
+    switch (optionId) {
+      case 'UNIQUE_BUTTON_ID_1':
         this.appointmentState[to] = { step: 'name' };
         response = 'Por favor ingresa tu nombre';
         break;
-      case 'consultar':
+      case 'UNIQUE_BUTTON_ID_2':
         response = 'Consultar mi mascota con IA';
         this.assitantState[to] = { step: 'question' };
         break;
-      case 'ver ubicación':
+      case 'UNIQUE_BUTTON_ID_3':
         response = 'Esta es nuestra ubicación: 📌 https://goo.gl/maps/example';
         break;
       case 'emergencia':
