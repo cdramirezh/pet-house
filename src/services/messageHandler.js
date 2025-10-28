@@ -1,10 +1,12 @@
 import whatsappService from './whatsappService.js';
 import appendToSheet from './googleSheetsService.js';
+import openAIService from './openAiService.js';
 
 class MessageHandler {
 
   constructor() {
     this.appointmentState = {};
+    this.assitantState = {};
   }
 
   isGreeting(message) {
@@ -28,6 +30,8 @@ class MessageHandler {
         await this.sendMedia(message.from, incomingMessage);
       } else if (this.appointmentState[message.from]) {
         await this.handleAppointmentFlow(message.from, incomingMessage);
+      } else if (this.assitantState[message.from]) {
+        await this.handleAssistantFlow(message.from, incomingMessage);
       } else {
         const response = `Echo: ${message.text.body}`;
         await whatsappService.sendMessage(message.from, response, message.id);
@@ -64,7 +68,7 @@ En qué puedo ayudarte hoy?`;
         type: "reply",
         reply: {
           id: "UNIQUE_BUTTON_ID_2",
-          title: "Consultar historial"
+          title: "Consultar"
         }
       },
       {
@@ -86,8 +90,9 @@ En qué puedo ayudarte hoy?`;
         this.appointmentState[to] = { step: 'name' };
         response = 'Por favor ingresa tu nombre';
         break;
-      case 'consultar historial':
-        response = 'Consultar historial médico de mi mascota';
+      case 'consultar':
+        response = 'Consultar mi mascota con IA';
+        this.assitantState[to] = { step: 'question' };
         break;
       case 'ver ubicación':
         response = 'Esta es nuestra ubicación: 📌 https://goo.gl/maps/example';
@@ -173,6 +178,44 @@ En qué puedo ayudarte hoy?`;
 
     appendToSheet(userData);
     return `Gracias. Resumen de tu cita:\nNombre: ${appointment.name}\nMascota: ${appointment.petName}\nTipo: ${appointment.petType}\nMotivo: ${appointment.reason}`;
+  }
+
+  async handleAssistantFlow(to, message) {
+    const state = this.assitantState[to];
+    let response;
+
+    if (state.step === 'question') {
+      response = await openAIService(message);
+    }
+
+    this.assitantState[to] = null;
+    await whatsappService.sendMessage(to, response);
+    const menuMessage = "Te sirvió la respuesta?"
+    const buttons = [
+      {
+        type: "reply",
+        reply: {
+          id: "UNIQUE_BUTTON_ID_YES",
+          title: "Sí",
+        }
+      },
+      {
+        type: "reply",
+        reply: {
+          id: "UNIQUE_BUTTON_ID_NEXT",
+          title: "Hacer otra pregunta",
+        }
+      },
+      {
+        type: 'reply',
+        reply: {
+          id: "UNIQUE_BUTTON_ID_EMERGENCY",
+          title: "Emergencia",
+        }
+      }
+
+    ]
+    await whatsappService.sendReplyButton(to, menuMessage, buttons);
   }
 }
 

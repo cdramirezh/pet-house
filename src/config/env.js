@@ -10,4 +10,5 @@ export default {
   PORT: process.env.PORT || 3000,
   CREDENTIAL: process.env.CREDENTIAL,
   SPREADSHEET_ID: process.env.SPREADSHEET_ID,
+  CHATGPT_API_KEY: process.env.CHATGPT_API_KEY,
 };
