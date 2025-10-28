@@ -95,7 +95,8 @@ En qué puedo ayudarte hoy?`;
         this.assitantState[to] = { step: 'question' };
         break;
       case 'UNIQUE_BUTTON_ID_3':
-        response = 'Esta es nuestra ubicación: 📌 https://goo.gl/maps/example';
+        response = 'Esta es nuestra ubicación 📌:';
+        await this.sendLocation(to);
         break;
       case 'emergencia':
         response = 'Llama acá para emergencias:';
@@ -269,6 +270,15 @@ En qué puedo ayudarte hoy?`;
       ]
     };
     await whatsappService.sendContactMessage(to, contact);
+  }
+
+  async sendLocation(to) {
+    const latitude = 6.0336111
+    const longitude = -75.4355556
+    const name = "PetHouse Veterinaria"
+    const address = "Calle 123 #45-67, Ciudad, País"
+
+    await whatsappService.sendLocationMessage(to, latitude, longitude, name, address);
   }
 }
 
