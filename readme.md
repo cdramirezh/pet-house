@@ -1,1 +1,1 @@
-Besided the .env variables, you'll need to provide a JSON file with Google Cloud credentials stored in the 'credentials' folder that matched the CREDENTIAL env variable
+Besides the .env variables, you'll need to provide a JSON file with Google Cloud credentials stored in the 'credentials' folder that matched the CREDENTIAL env variable
